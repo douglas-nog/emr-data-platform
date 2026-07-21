@@ -1,0 +1,20 @@
+# Copy to ~/.dbt/profiles.yml or point DBT_PROFILES_DIR at this directory.
+# 'host' is required but ignored when SPARK_REMOTE is set.
+macro:
+  target: dev
+  outputs:
+    dev:
+      type: spark
+      method: session
+      schema: macro_sot_dev
+      host: NA
+    hom:
+      type: spark
+      method: session
+      schema: macro_sot_hom
+      host: NA
+    prod:
+      type: spark
+      method: session
+      schema: macro_sot_prod
+      host: NA

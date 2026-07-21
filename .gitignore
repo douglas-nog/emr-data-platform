@@ -1,0 +1,52 @@
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+!*.auto.tfvars.example
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+.terraform.lock.hcl.bak
+
+# dbt
+target/
+dbt_packages/
+logs/
+.user.yml
+profiles.yml
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Airflow
+airflow.db
+airflow.cfg
+standalone_admin_password.txt
+
+# Ambiente
+.env
+.env.*
+!.env.example
+
+# IDE / SO
+.idea/
+.vscode/
+.DS_Store

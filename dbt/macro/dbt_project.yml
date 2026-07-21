@@ -1,0 +1,36 @@
+name: "macro"
+version: "1.0.0"
+config-version: 2
+
+profile: "macro"
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  env: "{{ env_var('EDP_ENV', 'dev') }}"
+
+models:
+  macro:
+    +file_format: iceberg
+    +materialized: table
+    staging:
+      +materialized: view
+      +schema: "sot_{{ env_var('EDP_ENV', 'dev') }}"
+    sot:
+      +schema: "sot_{{ env_var('EDP_ENV', 'dev') }}"
+      +contract:
+        enforced: true
+    spec:
+      +schema: "spec_{{ env_var('EDP_ENV', 'dev') }}"
+      +contract:
+        enforced: true
+      +access: public
+
+tests:
+  macro:
+    +store_failures: true
+    +schema: "dq_{{ env_var('EDP_ENV', 'dev') }}"
