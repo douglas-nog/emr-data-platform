@@ -12,6 +12,14 @@ locals {
 }
 
 resource "aws_s3_bucket" "tfstate" {
+  # checkov:skip=CKV_AWS_145:AES256 is deliberate. A customer-managed KMS key
+  # carries a mandatory 7-30 day deletion window, which conflicts with the
+  # ephemeral destroy/recreate cycle. KMS is used on the data layers instead.
+  # checkov:skip=CKV_AWS_144:Cross-region replication doubles storage cost for
+  # disaster recovery this project does not require. Versioning covers recovery.
+  # checkov:skip=CKV_AWS_18:Server access logging requires a dedicated log
+  # bucket. Tracked as a roadmap item.
+  # checkov:skip=CKV2_AWS_62:No event consumers exist for the state bucket.
   bucket           = local.state_bucket_name
   bucket_namespace = "account-regional"
 
