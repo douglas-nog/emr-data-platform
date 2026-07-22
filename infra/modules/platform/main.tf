@@ -88,4 +88,9 @@ resource "aws_emrserverless_application" "spark" {
     cpu    = var.emr_max_cpu
     memory = var.emr_max_memory
   }
+
+  scheduler_configuration {
+    max_concurrent_runs   = var.emr_max_concurrent_runs
+    queue_timeout_minutes = var.emr_queue_timeout_minutes
+  }
 }

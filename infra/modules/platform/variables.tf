@@ -37,3 +37,15 @@ variable "log_retention_days" {
   type        = number
   default     = 30
 }
+
+variable "emr_max_concurrent_runs" {
+  description = "Maximum job runs executing at once. Additional runs are queued."
+  type        = number
+  default     = 15
+}
+
+variable "emr_queue_timeout_minutes" {
+  description = "How long a queued job waits before timing out."
+  type        = number
+  default     = 360
+}
