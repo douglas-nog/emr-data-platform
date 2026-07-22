@@ -9,3 +9,9 @@ variable "env" {
   type        = string
   default     = "dev"
 }
+
+variable "project" {
+  description = "Project short name, used as the resource name prefix."
+  type        = string
+  default     = "edp"
+}

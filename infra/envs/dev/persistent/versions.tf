@@ -10,7 +10,7 @@ terraform {
 
   backend "s3" {
     # Remaining values come from backend.hcl (see backend.hcl.example)
-    key          = "edp/dev/platform/terraform.tfstate"
+    key          = "edp/dev/persistent/terraform.tfstate"
     use_lockfile = true
   }
 }

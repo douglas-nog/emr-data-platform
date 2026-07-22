@@ -11,17 +11,20 @@ Status: ✅ done · 🔶 partial · ⬜ pending
 
 | Item | Status |
 |---|---|
-| Repository structure + branch flow (feature → develop → homolog → main) | ✅ |
+| Repository structure | ✅ |
+| Branch flow (feature → develop → homolog → main) | 🔶 |
+| Local development environment (Python 3.11 venv, Terraform, AWS CLI) | ✅ |
 | Naming convention (buckets, databases, roles, state keys) | ✅ |
 | ADRs 0001–0006 (MADR 4.0) | ✅ |
 | IAM Identity Center + temporary CLI credentials | ✅ |
-| Terraform state bucket (S3 account regional namespace) | ✅ |
-| S3-native state locking (no DynamoDB) | ✅ |
+| Billing console access activated | ✅ |
+| Terraform state bucket (account regional namespace, versioning, S3 locking) | ✅ |
 | Bootstrap state migrated to the remote backend | ✅ |
 | AWS Budgets: monthly limit + actual and forecast alerts | ✅ |
 | Slice 1 scope and acceptance criteria | ✅ |
 | Project roadmap | ✅ |
-| Operations runbook | ⬜ |
+| Operations runbook | ✅ |
+| CLI-based deploys until the pipeline lands in v9 | ✅ |
 
 ## v2 — Platform core (shared, single instance)
 
