@@ -16,7 +16,7 @@ Status: ✅ done · 🔶 partial · ⬜ pending
 | Local development environment (Python 3.11 venv, Terraform, AWS CLI) | ✅ |
 | Naming convention (buckets, databases, roles, state keys) | ✅ |
 | ADRs 0001–0006 (MADR 4.0) | ✅ |
-| IAM Identity Center + temporary CLI credentials | ✅ |
+| IAM auth: user assumes admin role with MFA (no Identity Center) | ✅ |
 | Billing console access activated | ✅ |
 | Terraform state bucket (account regional namespace, versioning, S3 locking) | ✅ |
 | Bootstrap state migrated to the remote backend | ✅ |
@@ -30,29 +30,36 @@ Status: ✅ done · 🔶 partial · ⬜ pending
 
 | Item | Status |
 |---|---|
-| `platform`: EMR Serverless application (release 7.13, auto-stop, capacity ceiling) | ✅ |
+| `platform`: EMR Serverless application (release 7.13, auto-stop, capacity ceiling) | 🔶 |
 | `platform`: logs bucket with 30-day expiration | ✅ |
+| `platform`: artifacts bucket for job code and configs | ✅ |
 | `domain`: buckets per layer (landing, sor, sot, spec) | ✅ |
 | `domain`: Glue databases per table layer | ✅ |
 | `domain`: EMR execution role scoped to the domain | ✅ |
 | Environment split into `persistent` and `ephemeral` stacks | ✅ |
 | Trivial `start-job-run` validated end to end | ⬜ |
 
-## v3 — Domain module + `macro` ingestion
+## v3 — `macro` ingestion (Landing)
 
 | Item | Status |
 |---|---|
-| `domain` module: buckets per layer, parameterized by domain and env | ⬜ |
-| `domain` module: Glue databases + IAM role per domain | ⬜ |
 | Table config schema (YAML): source, schema, PK, merge keys, partitioning | ⬜ |
 | `rest_api` connector (Central Bank SGS) | ✅ |
-| Landing job: raw JSON, partitioned by ingestion date, idempotent | ✅ |
-| Generic SOR loader: declared schema, typing, `MERGE INTO` on Iceberg | ⬜ |
-| Unit tests for connector and loader (pytest) | ✅ |
-| SOR tables: `selic_daily`, `cdi_daily`, `ipca_monthly`, `ptax_usd_daily` | ⬜ |
-| Idempotency proven: two consecutive runs, same row count | ⬜ |
+| Lambda ingestion function (arm64, layer built in Docker) | ✅ |
+| Landing writer: raw JSON, partitioned by ingestion date | ✅ |
+| Unit tests for connector, writer, handler (95% coverage) | ✅ |
+| End-to-end invocation validated (Selic landed on S3) | ✅ |
 
-## v4 — Transformation (SOT + SPEC)
+## v3b — SOR loader (blocked on EMR)
+
+| Item | Status |
+|---|---|
+| Generic SOR loader: declared schema, typing, `MERGE INTO` on Iceberg | ⬜ |
+| SOR tables: `selic_daily`, `cdi_daily`, `ipca_monthly`, `ptax_usd_daily` | ⬜ |
+| Idempotency proven: two consecutive SOR runs, same row count | ⬜ |
+| Unit tests for the SOR loader | ⬜ |
+
+## v4 — Transformation (SOT + SPEC), blocked on EMR
 
 | Item | Status |
 |---|---|
@@ -76,15 +83,18 @@ Status: ✅ done · 🔶 partial · ⬜ pending
 | Session teardown guaranteed on failure (`on_failure`) | ⬜ |
 | Induced failure test: no orphaned session left behind | ⬜ |
 
-## v6 — Access control and governance
+## v6 — Access control and governance (no EMR dependency)
 
 | Item | Status |
 |---|---|
 | LF-Tag taxonomy: `domain`, `layer`, `env` | ⬜ |
+| Lake Formation registers the domain's S3 locations | ⬜ |
 | Grants: domain role reads its own layers only | ⬜ |
 | Cross-domain grant: SPEC only, never SOR or SOT | ⬜ |
 | Consumer role denied on SOT (`AccessDeniedException` proven) | ⬜ |
-| Slice 1 complete: `macro` on `dev`, Landing → SPEC | ⬜ |
+
+> The Landing → SPEC end-to-end slice closes once v3b and v4 unblock; it depends
+> on data flowing through the Iceberg layers, which needs EMR.
 
 ## v7 — Second domain (`fundos`)
 
@@ -142,7 +152,7 @@ Status: ✅ done · 🔶 partial · ⬜ pending
 | Two roles proven: one sees the column, one sees it masked | ⬜ |
 | S3 server access logging bucket (clears CKV_AWS_18) | ⬜ |
 | IAM policy denying bucket creation outside the account regional namespace | ⬜ |
-| Least-privilege review: replace `AdministratorAccess` permission set | ⬜ |
+| Least-privilege review: replace the broad admin role | ⬜ |
 
 ## v12 — Observability and lifecycle
 
@@ -191,8 +201,10 @@ promotion · OpenMetadata lineage and discovery · cost governance.
 ```
 BCB API ─┐
          ├→ Landing (raw) → SOR (Iceberg) → SOT (dbt) → SPEC (output port)
-CVM ZIP ─┘     PySpark        MERGE          EMR Serverless + dbt-spark
+CVM ZIP ─┘   Lambda/PySpark   MERGE          EMR Serverless + dbt-spark
 
+Ingestion: serverless and lightweight (Lambda) — an HTTP fetch and an S3 write.
+Processing: Spark on EMR Serverless — the distributed MERGE and dbt models.
 Orchestration: Airflow on EC2, one EMR job run per table.
 Catalog: Glue Data Catalog (technical) + OpenMetadata (discovery).
 Access: Lake Formation LF-Tags — SPEC is the only cross-domain surface.
@@ -213,6 +225,8 @@ Delivery: Terraform, CLI during development, GitHub Actions from v9 onward.
   (ADR-0005).
 - Airflow self-hosted on EC2 instead of MWAA, trading high availability for cost
   and setup speed (ADR-0006).
+- Ingestion is serverless and light (Lambda); processing is Spark (EMR). Each
+  workload runs on the engine that fits it, not on Spark by reflex.
 - Git is the source of truth; SQL and table configs are deployed to S3 by the
   pipeline, never edited in place.
 - Config declares data, never behavior: a new source means a new connector, not
