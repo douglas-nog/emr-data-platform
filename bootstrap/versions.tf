@@ -9,7 +9,7 @@ terraform {
   }
 
   backend "s3" {
-    bucket       = "edp-tfstate-464868388894-us-east-1-an"
+    bucket       = "edp-tfstate-646455641766-us-east-1-an"
     key          = "edp/bootstrap/terraform.tfstate"
     region       = "us-east-1"
     encrypt      = true
