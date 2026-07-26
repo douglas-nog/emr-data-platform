@@ -83,18 +83,19 @@ Status: ✅ done · 🔶 partial · ⬜ pending
 | Session teardown guaranteed on failure (`on_failure`) | ⬜ |
 | Induced failure test: no orphaned session left behind | ⬜ |
 
-## v6 — Access control and governance (no EMR dependency)
+## v6 — Access control and governance
 
 | Item | Status |
 |---|---|
-| LF-Tag taxonomy: `domain`, `layer`, `env` | ⬜ |
-| Lake Formation registers the domain's S3 locations | ⬜ |
-| Grants: domain role reads its own layers only | ⬜ |
-| Cross-domain grant: SPEC only, never SOR or SOT | ⬜ |
-| Consumer role denied on SOT (`AccessDeniedException` proven) | ⬜ |
-
-> The Landing → SPEC end-to-end slice closes once v3b and v4 unblock; it depends
-> on data flowing through the Iceberg layers, which needs EMR.
+| LF-Tag taxonomy: `domain`, `layer`, `env` | ✅ |
+| Lake Formation Data Lake Administrator configured | ✅ |
+| Lake Formation registers the domain's Iceberg S3 locations | ✅ |
+| LF-Tags applied to the domain's databases | ✅ |
+| Dedicated per-domain registration role (scoped to its buckets) | ✅ |
+| Intra-domain grant: EMR role reads its own layers (SELECT/DESCRIBE) | ✅ |
+| EMR role IAM policy allows `lakeformation:GetDataAccess` | ✅ |
+| Strict mode: remove `IAMAllowedPrincipals` fallback | ⬜ |
+| Cross-domain access denial proven (`AccessDeniedException` on SOR) | ⬜ |
 
 ## v7 — Second domain (`fundos`)
 

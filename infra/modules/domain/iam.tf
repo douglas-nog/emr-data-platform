@@ -71,6 +71,12 @@ data "aws_iam_policy_document" "emr_exec" {
       "arn:aws:s3:::${var.logs_bucket}/*",
     ]
   }
+  statement {
+    sid       = "LakeFormationDataAccess"
+    effect    = "Allow"
+    actions   = ["lakeformation:GetDataAccess"]
+    resources = ["*"]
+  }
 
   statement {
     sid    = "GlueOwnDatabases"
