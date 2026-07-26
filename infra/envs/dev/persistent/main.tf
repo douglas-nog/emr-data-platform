@@ -3,6 +3,7 @@ module "platform" {
 
   project = var.project
   env     = var.env
+  lakeformation_admin_arn = var.lakeformation_admin_arn
 }
 
 # First domain. The module is parameterized, so `fundos` will be a second

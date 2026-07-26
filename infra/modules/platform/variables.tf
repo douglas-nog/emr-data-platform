@@ -49,3 +49,20 @@ variable "emr_queue_timeout_minutes" {
   type        = number
   default     = 360
 }
+
+variable "lakeformation_admin_arn" {
+  description = "IAM role ARN registered as Lake Formation Data Lake Administrator."
+  type        = string
+}
+
+variable "domains" {
+  description = "Domain values for the LF-Tag taxonomy."
+  type        = list(string)
+  default     = ["macro", "fundos"]
+}
+
+variable "environments" {
+  description = "Environment values for the LF-Tag taxonomy."
+  type        = list(string)
+  default     = ["dev", "hom", "prod"]
+}

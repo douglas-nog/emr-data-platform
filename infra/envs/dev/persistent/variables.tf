@@ -15,3 +15,8 @@ variable "project" {
   type        = string
   default     = "edp"
 }
+
+variable "lakeformation_admin_arn" {
+  description = "IAM role ARN registered as Lake Formation Data Lake Administrator."
+  type        = string
+}
