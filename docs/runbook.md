@@ -7,92 +7,42 @@ roadmap phase lands; this file covers what currently exists (v1 — Foundation).
 
 ## 1. Access
 
-Two identities exist, with different purposes.
+Access uses an IAM user that assumes an admin role with MFA. No Identity Center,
+no Organization — that combination expires Free Tier credits.
 
-| Identity | Works on | Purpose |
-|---|---|---|
-| IAM Identity Center user | console + CLI | daily use |
-| IAM user (admin group) | console only | break-glass fallback |
+| Component | Purpose |
+|---|---|
+| IAM user `douglas_eng` | holds the static access key; only assumes the role |
+| Role `edp-admin-role` | admin permissions, requires MFA, 4-hour sessions |
+| Profile `edp-base` | the user's static credentials, never used directly |
+| Profile `edp` | assumes the role; this is the daily-use profile |
 
-Neither has access keys. Long-lived credentials are not used in this project.
-
-### 1.1 Console access
-
-Open the AWS access portal, sign in, and pick the account and permission set:
-
-```
-https://d-906676744b.awsapps.com/start
-```
-
-This is the same identity used by the CLI. Do not sign in through the IAM user
-for routine work.
-
-### 1.2 CLI access
-
-The profile is configured once:
+### 1.1 Starting a work session
 
 ```bash
-aws configure sso --profile edp
+aws sts get-caller-identity --profile edp
 ```
 
-| Prompt | Value |
-|---|---|
-| SSO session name | `edp` |
-| SSO start URL | `https://d-906676744b.awsapps.com/start` |
-| SSO region | `us-east-1` |
-| SSO registration scopes | default |
-| CLI default client Region | `us-east-1` |
-| CLI default output format | `json` |
-| CLI profile name | `edp` |
+The first call each session prompts for the MFA code. The `Arn` must contain
+`assumed-role/edp-admin-role`. Sessions last 4 hours; when they expire, the next
+call prompts for MFA again.
 
 `export AWS_PROFILE=edp` is set in `~/.zshrc`, so every new shell uses it.
 
-### 1.3 Starting a work session
+### 1.2 Console access
 
-Sessions last 8 hours. At the start of each working day:
+Sign in with the `douglas_eng` IAM user and its MFA device.
 
-```bash
-aws sso login --profile edp
-```
+### 1.3 Programmatic credentials
 
-A browser window opens for device authorization. Confirm the code shown in the
-terminal and approve.
-
-Verify:
-
-```bash
-aws sts get-caller-identity
-```
-
-The `Arn` must contain `assumed-role/AWSReservedSSO_AdministratorAccess`. If it
-contains `user/`, another profile is taking precedence — check `AWS_PROFILE`.
-
-### 1.4 Expired session
-
-Terraform and the CLI fail with credential errors when the session expires. The
-fix is the same command:
-
-```bash
-aws sso login --profile edp
-```
-
-Nothing is reconfigured. The profile persists; only the session expires.
-
-### 1.5 Programmatic credentials without access keys
-
-If a tool cannot use SSO directly, export temporary credentials from the active
-session instead of creating an access key:
+If a tool cannot assume the role directly, export temporary credentials from the
+active session:
 
 ```bash
 aws configure export-credentials --profile edp --format env
 ```
 
-These expire with the session. Never create an access key for either identity.
-
-### 1.6 Break-glass
-
-If Identity Center becomes unavailable, sign in to the console with the IAM user
-and MFA. Use it only to restore Identity Center, then return to normal access.
+These expire with the session.
 
 ---
 

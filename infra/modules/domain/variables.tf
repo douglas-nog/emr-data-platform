@@ -17,3 +17,8 @@ variable "logs_bucket" {
   description = "Platform logs bucket the execution role may write to."
   type        = string
 }
+
+variable "artifacts_bucket" {
+  description = "Platform artifacts bucket the execution role may read from."
+  type        = string
+}

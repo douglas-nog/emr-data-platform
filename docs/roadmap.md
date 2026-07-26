@@ -26,18 +26,16 @@ Status: ✅ done · 🔶 partial · ⬜ pending
 | Operations runbook | ✅ |
 | CLI-based deploys until the pipeline lands in v9 | ✅ |
 
-## v2 — Platform core (shared, single instance)
+## v2 — Platform core
 
 | Item | Status |
 |---|---|
-| `network`: VPC, private subnets, route tables | ⬜ |
-| `network`: VPC endpoints (S3 gateway, Glue, STS, Logs) | ⬜ |
-| `security-baseline`: KMS keys per layer | ⬜ |
-| `security-baseline`: IAM roles (EMR execution, Airflow instance) | ⬜ |
-| `catalog`: Glue databases per domain, layer, and environment | ⬜ |
-| `catalog`: Lake Formation data lake settings + S3 location registration | ⬜ |
-| `compute`: EMR Serverless application (release ≥ 7.13) | ⬜ |
-| `compute`: job logs and Spark event logs to S3 | ⬜ |
+| `platform`: EMR Serverless application (release 7.13, auto-stop, capacity ceiling) | ✅ |
+| `platform`: logs bucket with 30-day expiration | ✅ |
+| `domain`: buckets per layer (landing, sor, sot, spec) | ✅ |
+| `domain`: Glue databases per table layer | ✅ |
+| `domain`: EMR execution role scoped to the domain | ✅ |
+| Environment split into `persistent` and `ephemeral` stacks | ✅ |
 | Trivial `start-job-run` validated end to end | ⬜ |
 
 ## v3 — Domain module + `macro` ingestion
@@ -47,8 +45,8 @@ Status: ✅ done · 🔶 partial · ⬜ pending
 | `domain` module: buckets per layer, parameterized by domain and env | ⬜ |
 | `domain` module: Glue databases + IAM role per domain | ⬜ |
 | Table config schema (YAML): source, schema, PK, merge keys, partitioning | ⬜ |
-| `rest_api` connector (Central Bank SGS) | ⬜ |
-| Landing job: raw JSON, partitioned by ingestion date, idempotent | ⬜ |
+| `rest_api` connector (Central Bank SGS) | ✅ |
+| Landing job: raw JSON, partitioned by ingestion date, idempotent | ✅ |
 | Generic SOR loader: declared schema, typing, `MERGE INTO` on Iceberg | ⬜ |
 | Unit tests for connector and loader (pytest) | ⬜ |
 | SOR tables: `selic_daily`, `cdi_daily`, `ipca_monthly`, `ptax_usd_daily` | ⬜ |

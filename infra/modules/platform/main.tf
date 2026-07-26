@@ -11,6 +11,14 @@ locals {
     data.aws_caller_identity.current.account_id,
     data.aws_region.current.region
   )
+
+  artifacts_bucket_name = format(
+    "%s-artifacts-%s-%s-%s-an",
+    local.name_prefix,
+    var.env,
+    data.aws_caller_identity.current.account_id,
+    data.aws_region.current.region
+  )
 }
 
 # Job logs and Spark event logs. Shared by every domain in this environment.
@@ -25,6 +33,38 @@ resource "aws_s3_bucket" "logs" {
 
   bucket_namespace = "account-regional"
   force_destroy    = true
+}
+
+# Job code: PySpark scripts, Python packages, and table configs. Git is the
+# source of truth; this bucket is a deployment target, never edited in place.
+resource "aws_s3_bucket" "artifacts" {
+  # checkov:skip=CKV_AWS_145:AES256 is deliberate; code is not sensitive here.
+  # checkov:skip=CKV_AWS_144:Cross-region replication is not required.
+  # checkov:skip=CKV_AWS_18:Access logging is tracked as a roadmap item (v11).
+  # checkov:skip=CKV2_AWS_62:No event consumers exist yet.
+  # checkov:skip=CKV_AWS_21:Git already provides version history for this code.
+  bucket           = local.artifacts_bucket_name
+  bucket_namespace = "account-regional"
+  force_destroy    = true
+}
+
+resource "aws_s3_bucket_public_access_block" "artifacts" {
+  bucket                  = aws_s3_bucket.artifacts.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "artifacts" {
+  bucket = aws_s3_bucket.artifacts.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+    bucket_key_enabled = true
+  }
 }
 
 resource "aws_s3_bucket_public_access_block" "logs" {

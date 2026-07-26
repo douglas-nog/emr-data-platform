@@ -33,6 +33,17 @@ resource "aws_iam_role" "emr_exec" {
 # this domain's buckets and databases only. A job in another domain physically
 # cannot read these paths.
 data "aws_iam_policy_document" "emr_exec" {
+
+  statement {
+    sid     = "ReadJobCode"
+    effect  = "Allow"
+    actions = ["s3:GetObject", "s3:ListBucket"]
+    resources = [
+      "arn:aws:s3:::${var.artifacts_bucket}",
+      "arn:aws:s3:::${var.artifacts_bucket}/*",
+    ]
+  }
+  
   statement {
     sid     = "ListOwnBuckets"
     effect  = "Allow"

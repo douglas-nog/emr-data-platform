@@ -22,3 +22,8 @@ output "macro_emr_role_arn" {
   description = "Execution role EMR Serverless assumes for macro jobs."
   value       = module.macro.emr_execution_role_arn
 }
+
+output "macro_ingestion_function" {
+  description = "Lambda function name for macro ingestion."
+  value       = module.macro_ingestion.function_name
+}
