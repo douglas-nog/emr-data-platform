@@ -114,12 +114,7 @@ LF-Tags per domain — rather than organizationally. See
 
 ## Roadmap
 
-- [ ] **Slice 1** — `macro` on `dev`, Landing → SOR → SOT → SPEC, one BCB series
-- [ ] `fundos` domain with 5-year backfill
-- [ ] `hom` and `prod` environments
-- [ ] OpenMetadata and derived ODCS contracts
-- [ ] Classification and masking through Lake Formation
-- [ ] (optional) RAG layer — decided at the end of the project
+See [docs/roadmap.md](docs/roadmap.md) for the phased plan and current status.
 
 ## License
 

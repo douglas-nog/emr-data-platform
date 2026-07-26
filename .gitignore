@@ -15,6 +15,7 @@ override.tf.json
 .terraformrc
 terraform.rc
 .terraform.lock.hcl.bak
+backend.hcl
 
 # dbt
 target/
@@ -50,3 +51,7 @@ standalone_admin_password.txt
 .idea/
 .vscode/
 .DS_Store
+
+# Lambda layer build artifacts
+jobs/ingestion/layer/layer.zip
+jobs/ingestion/layer/build/

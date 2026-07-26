@@ -1,0 +1,4 @@
+# Copy to dev.auto.tfvars and fill in the values for your account.
+aws_region              = "us-east-1"
+env                     = "dev"
+lakeformation_admin_arn = "arn:aws:iam::<ACCOUNT_ID>:role/edp-admin-role"
