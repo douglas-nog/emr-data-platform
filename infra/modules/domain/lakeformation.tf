@@ -98,3 +98,43 @@ resource "aws_lakeformation_resource_lf_tags" "database" {
 
   depends_on = [aws_lakeformation_resource.layer]
 }
+
+# ---------------------------------------------------------------------------
+# Intra-domain grant: the domain's EMR role reads all of its own layers via a
+# single domain-wide tag expression. SELECT/DESCRIBE only — never ALL, never
+# DROP. This is the "bind role to table" pattern, expressed by tag. Cross-domain
+# grants (v7) are declared separately as domain=<producer> AND layer=spec.
+# ---------------------------------------------------------------------------
+resource "aws_lakeformation_permissions" "emr_domain_read" {
+  principal   = aws_iam_role.emr_exec.arn
+  permissions = ["SELECT", "DESCRIBE"]
+
+  lf_tag_policy {
+    resource_type = "TABLE"
+
+    expression {
+      key    = "domain"
+      values = [var.domain]
+    }
+  }
+
+  depends_on = [aws_lakeformation_resource_lf_tags.database]
+}
+
+# The domain role also needs DESCRIBE on the databases themselves to resolve
+# them, not just the tables within.
+resource "aws_lakeformation_permissions" "emr_domain_db" {
+  principal   = aws_iam_role.emr_exec.arn
+  permissions = ["DESCRIBE"]
+
+  lf_tag_policy {
+    resource_type = "DATABASE"
+
+    expression {
+      key    = "domain"
+      values = [var.domain]
+    }
+  }
+
+  depends_on = [aws_lakeformation_resource_lf_tags.database]
+}
