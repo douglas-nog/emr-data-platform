@@ -48,7 +48,7 @@ Status: ✅ done · 🔶 partial · ⬜ pending
 | `rest_api` connector (Central Bank SGS) | ✅ |
 | Landing job: raw JSON, partitioned by ingestion date, idempotent | ✅ |
 | Generic SOR loader: declared schema, typing, `MERGE INTO` on Iceberg | ⬜ |
-| Unit tests for connector and loader (pytest) | ⬜ |
+| Unit tests for connector and loader (pytest) | ✅ |
 | SOR tables: `selic_daily`, `cdi_daily`, `ipca_monthly`, `ptax_usd_daily` | ⬜ |
 | Idempotency proven: two consecutive runs, same row count | ⬜ |
 
