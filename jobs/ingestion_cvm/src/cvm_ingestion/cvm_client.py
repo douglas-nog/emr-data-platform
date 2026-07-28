@@ -18,8 +18,6 @@ _RETRY_STATUSES = (429, 500, 502, 503, 504)
 
 @dataclass(frozen=True)
 class CvmRequest:
-    """A single fetch instruction for one monthly report (YYYYMM)."""
-
     year_month: str
 
     def __post_init__(self) -> None:
@@ -32,7 +30,6 @@ class CvmRequest:
 
 
 def _build_session(total_retries: int = 3, backoff_factor: float = 1.0) -> requests.Session:
-    """Session with retry and backoff on transient errors (backoff 0s, 2s, 4s)."""
     retry = Retry(
         total=total_retries,
         status_forcelist=_RETRY_STATUSES,
@@ -51,11 +48,6 @@ def _build_url(year_month: str, base_url: str) -> str:
 
 
 def extract_csv(zip_bytes: bytes) -> str:
-    """Decompress the single CSV from the ZIP and decode it, raw and untyped.
-
-    The CVM ZIP holds one CSV named like the archive. Content is returned
-    exactly as delivered (latin-1 decoded), with no parsing or type conversion.
-    """
     with zipfile.ZipFile(io.BytesIO(zip_bytes)) as archive:
         names = [n for n in archive.namelist() if n.lower().endswith(".csv")]
         if len(names) != 1:
@@ -72,11 +64,6 @@ def fetch_report(
     timeout: tuple[int, int] = (30, 120),
     base_url: str = _BASE_URL,
 ) -> str:
-    """Fetch one monthly report and return its CSV content, raw and untyped.
-
-    session is injectable so tests can pass a mock; timeout is (connect, read),
-    with a longer read window than BCB because the payload is larger.
-    """
     session = session or _build_session()
     url = _build_url(request.year_month, base_url)
 
