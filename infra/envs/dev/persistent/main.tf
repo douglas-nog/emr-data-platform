@@ -27,6 +27,6 @@ module "macro_ingestion" {
   domain         = "macro"
   landing_bucket = module.macro.buckets["landing"]
 
-  source_dir = "${path.root}/../../../../jobs/ingestion/src"
-  layer_zip  = "${path.root}/../../../../jobs/ingestion/layer/layer.zip"
+  source_dir = "${path.root}/../../../../jobs/ingestion_bcb/src"
+  layer_zip  = "${path.root}/../../../../jobs/ingestion_bcb/layer/layer.zip"
 }
