@@ -106,31 +106,3 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs" {
   }
 }
 
-resource "aws_emrserverless_application" "spark" {
-  name          = "${var.project}-spark-${var.env}"
-  release_label = var.emr_release_label
-  type          = "SPARK"
-
-  # Start on job submission, so nothing is billed while idle.
-  auto_start_configuration {
-    enabled = true
-  }
-
-  # Safety net against a forgotten interactive session. This is independent of
-  # any teardown logic in the orchestrator.
-  auto_stop_configuration {
-    enabled              = true
-    idle_timeout_minutes = var.emr_idle_timeout_minutes
-  }
-
-  # Hard ceiling on what a runaway job can allocate.
-  maximum_capacity {
-    cpu    = var.emr_max_cpu
-    memory = var.emr_max_memory
-  }
-
-  scheduler_configuration {
-    max_concurrent_runs   = var.emr_max_concurrent_runs
-    queue_timeout_minutes = var.emr_queue_timeout_minutes
-  }
-}

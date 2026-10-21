@@ -1,13 +1,13 @@
-# EMR Serverless assumes this role to run jobs for this domain. The SourceArn
-# condition scopes the trust to applications in this account only.
-data "aws_iam_policy_document" "emr_assume" {
+# Glue assumes this role to run jobs for this domain. The SourceArn condition
+# scopes the trust to Glue jobs in this account only.
+data "aws_iam_policy_document" "glue_assume" {
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
 
     principals {
       type        = "Service"
-      identifiers = ["emr-serverless.amazonaws.com"]
+      identifiers = ["glue.amazonaws.com"]
     }
 
     condition {
@@ -19,20 +19,20 @@ data "aws_iam_policy_document" "emr_assume" {
     condition {
       test     = "ArnLike"
       variable = "aws:SourceArn"
-      values   = ["arn:aws:emr-serverless:${local.region}:${local.account_id}:/applications/*"]
+      values   = ["arn:aws:glue:${local.region}:${local.account_id}:job/*"]
     }
   }
 }
 
-resource "aws_iam_role" "emr_exec" {
-  name               = "${var.project}-emr-${var.domain}-${var.env}-role"
-  assume_role_policy = data.aws_iam_policy_document.emr_assume.json
+resource "aws_iam_role" "glue_exec" {
+  name               = "${var.project}-glue-${var.domain}-${var.env}-role"
+  assume_role_policy = data.aws_iam_policy_document.glue_assume.json
 }
 
 # This policy is the technical boundary between domains: it grants access to
 # this domain's buckets and databases only. A job in another domain physically
 # cannot read these paths.
-data "aws_iam_policy_document" "emr_exec" {
+data "aws_iam_policy_document" "glue_exec" {
 
   statement {
     sid     = "ReadJobCode"
@@ -111,8 +111,8 @@ data "aws_iam_policy_document" "emr_exec" {
   }
 }
 
-resource "aws_iam_role_policy" "emr_exec" {
-  name   = "${var.project}-emr-${var.domain}-${var.env}-policy"
-  role   = aws_iam_role.emr_exec.id
-  policy = data.aws_iam_policy_document.emr_exec.json
+resource "aws_iam_role_policy" "glue_exec" {
+  name   = "${var.project}-glue-${var.domain}-${var.env}-policy"
+  role   = aws_iam_role.glue_exec.id
+  policy = data.aws_iam_policy_document.glue_exec.json
 }

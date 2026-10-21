@@ -23,7 +23,7 @@ resource "aws_iam_role" "lambda" {
 }
 
 # Scoped to this domain's Landing bucket only. The function cannot touch any
-# other domain's data — the same boundary the EMR role enforces.
+# other domain's data — the same boundary the Glue role enforces.
 data "aws_iam_policy_document" "lambda" {
   statement {
     sid     = "WriteLanding"

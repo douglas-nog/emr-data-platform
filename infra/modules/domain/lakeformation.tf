@@ -100,13 +100,13 @@ resource "aws_lakeformation_resource_lf_tags" "database" {
 }
 
 # ---------------------------------------------------------------------------
-# Intra-domain grant: the domain's EMR role reads all of its own layers via a
+# Intra-domain grant: the domain's Glue role reads all of its own layers via a
 # single domain-wide tag expression. SELECT/DESCRIBE only — never ALL, never
 # DROP. This is the "bind role to table" pattern, expressed by tag. Cross-domain
 # grants (v7) are declared separately as domain=<producer> AND layer=spec.
 # ---------------------------------------------------------------------------
-resource "aws_lakeformation_permissions" "emr_domain_read" {
-  principal   = aws_iam_role.emr_exec.arn
+resource "aws_lakeformation_permissions" "glue_domain_read" {
+  principal   = aws_iam_role.glue_exec.arn
   permissions = ["SELECT", "DESCRIBE"]
 
   lf_tag_policy {
@@ -123,8 +123,8 @@ resource "aws_lakeformation_permissions" "emr_domain_read" {
 
 # The domain role also needs DESCRIBE on the databases themselves to resolve
 # them, not just the tables within.
-resource "aws_lakeformation_permissions" "emr_domain_db" {
-  principal   = aws_iam_role.emr_exec.arn
+resource "aws_lakeformation_permissions" "glue_domain_db" {
+  principal   = aws_iam_role.glue_exec.arn
   permissions = ["DESCRIBE"]
 
   lf_tag_policy {

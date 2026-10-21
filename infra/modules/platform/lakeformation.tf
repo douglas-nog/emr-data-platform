@@ -8,7 +8,7 @@ resource "aws_lakeformation_data_lake_settings" "this" {
   admins = [var.lakeformation_admin_arn]
 
   # Keep IAMAllowedPrincipals in the default permissions for now, so existing
-  # IAM-based access (EMR, Lambda) keeps working. Removing this is the explicit
+  # IAM-based access (Glue, Lambda) keeps working. Removing this is the explicit
   # final step of the strict-mode switch, done only after grants are in place.
   create_database_default_permissions {
     principal   = "IAM_ALLOWED_PRINCIPALS"
